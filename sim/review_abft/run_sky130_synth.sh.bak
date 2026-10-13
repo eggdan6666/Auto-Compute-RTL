@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# E3: Sky130 (sky130_fd_sc_hd, tt_025C_1v80) 映射综合签核 — 本机运行
+# 修正: dfflibmap 先将 DFF 映射到 sky130 触发器 (否则寄存器面积缺失);
+#       保留每个顶层的完整日志 sim/sky130_logs/<top>.log 供追溯。
+set -u
+cd "$(dirname "$0")/.."
+export PATH="/e/tools/oss-cad-suite/bin:/e/tools/oss-cad-suite/lib:$PATH"
+LIB="E:/tools/pdk/sky130_fd_sc_hd__tt_025C_1v80.lib"
+mkdir -p sim/sky130_logs
+
+run_synth () {  # $1=顶层 $2=日志名 $3=chparam(可空) $4...=源文件
+    local top=$1 tag=$2 cp=$3; shift 3
+    yosys -p "read_verilog -sv $*; $cp; hierarchy -top $top; proc; opt; flatten; techmap; opt; \
+              dfflibmap -liberty $LIB; abc -fast -liberty $LIB; write_blif sim/sky130_logs/$tag.blif; ltp -noff; stat -liberty $LIB" \
+          > "sim/sky130_logs/$tag.log" 2>&1
+    echo "== $tag done"
+}
+
+run_synth mac_unit            mac_unit      "" rtl/mac_unit.sv
+run_synth systolic_array      array4        "chparam -set NR 4 -set NC 4 systolic_array" rtl/systolic_pe.sv rtl/rne_sat16.sv rtl/systolic_array.sv
+run_synth systolic_array      array8        "chparam -set NR 8 -set NC 8 systolic_array" rtl/systolic_pe.sv rtl/rne_sat16.sv rtl/systolic_array.sv
+run_synth self_healing_array  self_healing  "" rtl/systolic_pe.sv rtl/rne_sat16.sv rtl/systolic_array.sv rtl/misr16.sv rtl/bist_controller.sv rtl/self_healing_array.sv
+run_synth axi_stream_array    axi_ip        "" rtl/systolic_pe.sv rtl/rne_sat16.sv rtl/systolic_array.sv rtl/misr16.sv rtl/bist_controller.sv rtl/self_healing_array.sv rtl/axi_stream_array.sv
+
+echo "==> 日志已写入 sim/sky130_logs/"

@@ -1,0 +1,831 @@
+==> [1/11] 重新生成黄金向量 (Python Golden Oracle)
+==> [2/11] Icarus 编译 MAC + 脉动阵列 + 自愈阵列 + AXI IP
+==> [3/11] Icarus 仿真: MAC 单元 (功能回归 + 黄金向量)
+
+========================================
+Starting MAC Unit Testbench...
+========================================
+
+[PASS] 1. Reset Test
+[PASS] 2. Basic Multiply (0.5 * 0.5) | Out=2000 Valid=1
+[PASS] 3. Negative Multiply (-0.5 * 0.5) | Out=e000 Valid=1
+[PASS] 4. Accumulate Test (0.25 + 0.5) | Out=6000 Valid=1
+[PASS] 5. Positive Saturation | Out=7fff Valid=1
+[PASS] 6. Negative Saturation | Out=8000 Valid=1
+[PASS] 7. Special Case A=B=16'h8000 | Out=7fff Valid=1
+[PASS] 8. Zero Inputs | Out=0000 Valid=1
+[PASS] 9. Pipeline 0 | Out=2000 Valid=1
+[PASS] 9. Pipeline 1 | Out=e000 Valid=1
+[PASS] 9. Pipeline 2 | Out=0800 Valid=1
+[PASS] 9. Pipeline 3 | Out=f800 Valid=1
+[PASS] 10. Valid Gating - Setup | Out=2000 Valid=1
+[PASS] 10. Valid Gating | Out held=2000
+[PASS] 11.1 RNE: G=1, St=0, L=0 (Round even down) | Out=0002 Valid=1
+[PASS] 11.2 RNE: G=1, St=0, L=1 (Round even up) | Out=0004 Valid=1
+[PASS] 11.3 RNE: G=1, St=1, L=0 (Round up) | Out=0003 Valid=1
+[PASS] 20.1 Golden Vector | Out=7fff Valid=1
+[PASS] 20.2 Golden Vector | Out=7fff Valid=1
+[PASS] 20.3 Golden Vector | Out=7fff Valid=1
+[PASS] 20.4 Golden Vector | Out=7ffe Valid=1
+[PASS] 20.5 Golden Vector | Out=8001 Valid=1
+[PASS] 20.6 Golden Vector | Out=7fff Valid=1
+[PASS] 20.7 Golden Vector | Out=8000 Valid=1
+[PASS] 20.8 Golden Vector | Out=0000 Valid=1
+[PASS] 20.9 Golden Vector | Out=0002 Valid=1
+[PASS] 20.10 Golden Vector | Out=0002 Valid=1
+[PASS] 20.11 Golden Vector | Out=0000 Valid=1
+[PASS] 20.12 Golden Vector | Out=fffe Valid=1
+[PASS] 20.13 Golden Vector | Out=fffe Valid=1
+[PASS] 20.14 Golden Vector | Out=8000 Valid=1
+[PASS] 20.15 Golden Vector | Out=0000 Valid=1
+
+========================================
+Test Summary:
+Total Tests : 32
+Passed      : 32
+Failed      : 0
+========================================
+>>> ALL TESTS PASSED <<<
+
+tb/tb_mac_unit.sv:294: $finish called at 1070000 (1ps)
+==> [4/11] Icarus 仿真: 脉动阵列 (黄金向量)
+
+========================================
+Starting Systolic Array Testbench (N=4)
+========================================
+
+[PASS] Reset Test
+--- Scenario 0: near-identity ---
+[PASS] S0 col0 row0 | Out=4000
+[PASS] S0 col0 row1 | Out=7ffe
+[PASS] S0 col1 row0 | Out=c000
+[PASS] S0 col0 row2 | Out=0000
+[PASS] S0 col1 row1 | Out=8001
+[PASS] S0 col2 row0 | Out=2000
+[PASS] S0 col0 row3 | Out=1234
+[PASS] S0 col1 row2 | Out=0000
+[PASS] S0 col2 row1 | Out=0001
+[PASS] S0 col3 row0 | Out=e000
+[PASS] S0 col0 row4 | Out=0001
+[PASS] S0 col1 row3 | Out=5677
+[PASS] S0 col2 row2 | Out=0000
+[PASS] S0 col3 row1 | Out=ffff
+[PASS] S0 col0 row5 | Out=ffff
+[PASS] S0 col1 row4 | Out=0002
+[PASS] S0 col2 row3 | Out=9abd
+[PASS] S0 col3 row2 | Out=0000
+[PASS] S0 col0 row6 | Out=7ffe
+[PASS] S0 col1 row5 | Out=fffe
+[PASS] S0 col2 row4 | Out=0004
+[PASS] S0 col3 row3 | Out=def0
+[PASS] S0 col0 row7 | Out=8001
+[PASS] S0 col1 row6 | Out=7ffe
+[PASS] S0 col2 row5 | Out=fffc
+[PASS] S0 col3 row4 | Out=0008
+[PASS] S0 col1 row7 | Out=8001
+[PASS] S0 col2 row6 | Out=7ffe
+[PASS] S0 col3 row5 | Out=fff8
+[PASS] S0 col2 row7 | Out=8001
+[PASS] S0 col3 row6 | Out=7ffe
+[PASS] S0 col3 row7 | Out=8001
+--- Scenario 1: all-max-pos saturate+ ---
+[PASS] S1 col0 row0 | Out=7fff
+[PASS] S1 col0 row1 | Out=7fff
+[PASS] S1 col1 row0 | Out=7fff
+[PASS] S1 col0 row2 | Out=7fff
+[PASS] S1 col1 row1 | Out=7fff
+[PASS] S1 col2 row0 | Out=7fff
+[PASS] S1 col0 row3 | Out=7fff
+[PASS] S1 col1 row2 | Out=7fff
+[PASS] S1 col2 row1 | Out=7fff
+[PASS] S1 col3 row0 | Out=7fff
+[PASS] S1 col0 row4 | Out=7fff
+[PASS] S1 col1 row3 | Out=7fff
+[PASS] S1 col2 row2 | Out=7fff
+[PASS] S1 col3 row1 | Out=7fff
+[PASS] S1 col0 row5 | Out=7fff
+[PASS] S1 col1 row4 | Out=7fff
+[PASS] S1 col2 row3 | Out=7fff
+[PASS] S1 col3 row2 | Out=7fff
+[PASS] S1 col0 row6 | Out=7fff
+[PASS] S1 col1 row5 | Out=7fff
+[PASS] S1 col2 row4 | Out=7fff
+[PASS] S1 col3 row3 | Out=7fff
+[PASS] S1 col0 row7 | Out=7fff
+[PASS] S1 col1 row6 | Out=7fff
+[PASS] S1 col2 row5 | Out=7fff
+[PASS] S1 col3 row4 | Out=7fff
+[PASS] S1 col1 row7 | Out=7fff
+[PASS] S1 col2 row6 | Out=7fff
+[PASS] S1 col3 row5 | Out=7fff
+[PASS] S1 col2 row7 | Out=7fff
+[PASS] S1 col3 row6 | Out=7fff
+[PASS] S1 col3 row7 | Out=7fff
+--- Scenario 2: (-1)x(-1) x4 guard-bits ---
+[PASS] S2 col0 row0 | Out=7fff
+[PASS] S2 col0 row1 | Out=7fff
+[PASS] S2 col1 row0 | Out=7fff
+[PASS] S2 col0 row2 | Out=7fff
+[PASS] S2 col1 row1 | Out=7fff
+[PASS] S2 col2 row0 | Out=7fff
+[PASS] S2 col0 row3 | Out=7fff
+[PASS] S2 col1 row2 | Out=7fff
+[PASS] S2 col2 row1 | Out=7fff
+[PASS] S2 col3 row0 | Out=7fff
+[PASS] S2 col0 row4 | Out=7fff
+[PASS] S2 col1 row3 | Out=7fff
+[PASS] S2 col2 row2 | Out=7fff
+[PASS] S2 col3 row1 | Out=7fff
+[PASS] S2 col0 row5 | Out=7fff
+[PASS] S2 col1 row4 | Out=7fff
+[PASS] S2 col2 row3 | Out=7fff
+[PASS] S2 col3 row2 | Out=7fff
+[PASS] S2 col0 row6 | Out=7fff
+[PASS] S2 col1 row5 | Out=7fff
+[PASS] S2 col2 row4 | Out=7fff
+[PASS] S2 col3 row3 | Out=7fff
+[PASS] S2 col0 row7 | Out=7fff
+[PASS] S2 col1 row6 | Out=7fff
+[PASS] S2 col2 row5 | Out=7fff
+[PASS] S2 col3 row4 | Out=7fff
+[PASS] S2 col1 row7 | Out=7fff
+[PASS] S2 col2 row6 | Out=7fff
+[PASS] S2 col3 row5 | Out=7fff
+[PASS] S2 col2 row7 | Out=7fff
+[PASS] S2 col3 row6 | Out=7fff
+[PASS] S2 col3 row7 | Out=7fff
+--- Scenario 3: all-max-neg saturate- ---
+[PASS] S3 col0 row0 | Out=8000
+[PASS] S3 col0 row1 | Out=8000
+[PASS] S3 col1 row0 | Out=8000
+[PASS] S3 col0 row2 | Out=8000
+[PASS] S3 col1 row1 | Out=8000
+[PASS] S3 col2 row0 | Out=8000
+[PASS] S3 col0 row3 | Out=8000
+[PASS] S3 col1 row2 | Out=8000
+[PASS] S3 col2 row1 | Out=8000
+[PASS] S3 col3 row0 | Out=8000
+[PASS] S3 col0 row4 | Out=8000
+[PASS] S3 col1 row3 | Out=8000
+[PASS] S3 col2 row2 | Out=8000
+[PASS] S3 col3 row1 | Out=8000
+[PASS] S3 col0 row5 | Out=8000
+[PASS] S3 col1 row4 | Out=8000
+[PASS] S3 col2 row3 | Out=8000
+[PASS] S3 col3 row2 | Out=8000
+[PASS] S3 col0 row6 | Out=8000
+[PASS] S3 col1 row5 | Out=8000
+[PASS] S3 col2 row4 | Out=8000
+[PASS] S3 col3 row3 | Out=8000
+[PASS] S3 col0 row7 | Out=8000
+[PASS] S3 col1 row6 | Out=8000
+[PASS] S3 col2 row5 | Out=8000
+[PASS] S3 col3 row4 | Out=8000
+[PASS] S3 col1 row7 | Out=8000
+[PASS] S3 col2 row6 | Out=8000
+[PASS] S3 col3 row5 | Out=8000
+[PASS] S3 col2 row7 | Out=8000
+[PASS] S3 col3 row6 | Out=8000
+[PASS] S3 col3 row7 | Out=8000
+--- Scenario 4: RNE midpoint odd/even ---
+[PASS] S4 col0 row0 | Out=0000
+[PASS] S4 col0 row1 | Out=0002
+[PASS] S4 col1 row0 | Out=0002
+[PASS] S4 col0 row2 | Out=0002
+[PASS] S4 col1 row1 | Out=0002
+[PASS] S4 col2 row0 | Out=0002
+[PASS] S4 col0 row3 | Out=0000
+[PASS] S4 col1 row2 | Out=0000
+[PASS] S4 col2 row1 | Out=0000
+[PASS] S4 col3 row0 | Out=0000
+[PASS] S4 col0 row4 | Out=fffe
+[PASS] S4 col1 row3 | Out=fffe
+[PASS] S4 col2 row2 | Out=fffe
+[PASS] S4 col3 row1 | Out=fffe
+[PASS] S4 col0 row5 | Out=fffe
+[PASS] S4 col1 row4 | Out=fffe
+[PASS] S4 col2 row3 | Out=fffe
+[PASS] S4 col3 row2 | Out=fffe
+[PASS] S4 col0 row6 | Out=0001
+[PASS] S4 col1 row5 | Out=0001
+[PASS] S4 col2 row4 | Out=0001
+[PASS] S4 col3 row3 | Out=0001
+[PASS] S4 col0 row7 | Out=ffff
+[PASS] S4 col1 row6 | Out=ffff
+[PASS] S4 col2 row5 | Out=ffff
+[PASS] S4 col3 row4 | Out=ffff
+[PASS] S4 col1 row7 | Out=0000
+[PASS] S4 col2 row6 | Out=0000
+[PASS] S4 col3 row5 | Out=0000
+[PASS] S4 col2 row7 | Out=0002
+[PASS] S4 col3 row6 | Out=0002
+[PASS] S4 col3 row7 | Out=0002
+--- Scenario 5: random full-range ---
+[PASS] S5 col0 row0 | Out=2b68
+[PASS] S5 col0 row1 | Out=e58e
+[PASS] S5 col1 row0 | Out=21b5
+[PASS] S5 col0 row2 | Out=2ab1
+[PASS] S5 col1 row1 | Out=d906
+[PASS] S5 col2 row0 | Out=5150
+[PASS] S5 col0 row3 | Out=edf8
+[PASS] S5 col1 row2 | Out=0e46
+[PASS] S5 col2 row1 | Out=d88c
+[PASS] S5 col3 row0 | Out=35d6
+[PASS] S5 col0 row4 | Out=7f43
+[PASS] S5 col1 row3 | Out=2439
+[PASS] S5 col2 row2 | Out=29f5
+[PASS] S5 col3 row1 | Out=b966
+[PASS] S5 col0 row5 | Out=b712
+[PASS] S5 col1 row4 | Out=4213
+[PASS] S5 col2 row3 | Out=557c
+[PASS] S5 col3 row2 | Out=5c27
+[PASS] S5 col0 row6 | Out=2965
+[PASS] S5 col1 row5 | Out=a810
+[PASS] S5 col2 row4 | Out=d407
+[PASS] S5 col3 row3 | Out=403f
+[PASS] S5 col0 row7 | Out=4ea4
+[PASS] S5 col1 row6 | Out=0c4b
+[PASS] S5 col2 row5 | Out=d4ed
+[PASS] S5 col3 row4 | Out=0b65
+[PASS] S5 col1 row7 | Out=684b
+[PASS] S5 col2 row6 | Out=3256
+[PASS] S5 col3 row5 | Out=e14a
+[PASS] S5 col2 row7 | Out=3a57
+[PASS] S5 col3 row6 | Out=2f20
+[PASS] S5 col3 row7 | Out=4878
+
+========================================
+Test Summary:
+Total Checks: 193
+Passed      : 193
+Failed      : 0
+========================================
+>>> ALL TESTS PASSED <<<
+
+tb/tb_systolic_array.sv:173: $finish called at 1300000 (1ps)
+==> [5/11] Icarus 仿真: 自愈阵列 (BIST + 故障注入 + 热替换)
+
+========================================
+Self-Healing Systolic Array Testbench (N=4)
+========================================
+
+--- Phase A: power-on BIST (expect healthy) ---
+[PASS] A.1 no fault detected
+[PASS] A.2 not healed
+[PASS] A.3 not unhealable
+--- Mission: healthy ---
+[PASS] healthy col0 row0 | Out=47bc
+[PASS] healthy col1 row0 | Out=eedd
+[PASS] healthy col2 row0 | Out=1c02
+[PASS] healthy col3 row0 | Out=cb1b
+[PASS] healthy col0 row1 | Out=7fff
+[PASS] healthy col1 row1 | Out=f700
+[PASS] healthy col2 row1 | Out=0c93
+[PASS] healthy col3 row1 | Out=dc2c
+[PASS] healthy col0 row2 | Out=d7f5
+[PASS] healthy col1 row2 | Out=e1f0
+[PASS] healthy col2 row2 | Out=3551
+[PASS] healthy col3 row2 | Out=0404
+[PASS] healthy col0 row3 | Out=8000
+[PASS] healthy col1 row3 | Out=b69a
+[PASS] healthy col2 row3 | Out=af81
+[PASS] healthy col3 row3 | Out=5edb
+[PASS] healthy col0 row4 | Out=d6a6
+[PASS] healthy col1 row4 | Out=cc7a
+[PASS] healthy col2 row4 | Out=8d7d
+[PASS] healthy col3 row4 | Out=7fff
+[PASS] healthy col0 row5 | Out=cca9
+[PASS] healthy col1 row5 | Out=7fff
+[PASS] healthy col2 row5 | Out=115e
+[PASS] healthy col3 row5 | Out=9e4d
+[PASS] healthy col0 row6 | Out=f9d3
+[PASS] healthy col1 row6 | Out=8000
+[PASS] healthy col2 row6 | Out=3403
+[PASS] healthy col3 row6 | Out=05d7
+[PASS] healthy col0 row7 | Out=0766
+[PASS] healthy col1 row7 | Out=f0df
+[PASS] healthy col2 row7 | Out=7fff
+[PASS] healthy col3 row7 | Out=8b16
+--- Phase B: inject stuck fault @ physical col 2 ---
+[PASS] B.1 fault detected
+[PASS] B.2 fault_col == 2
+[PASS] B.3 healed
+[PASS] B.4 not unhealable
+--- Mission: healed ---
+[PASS] healed col0 row0 | Out=47bc
+[PASS] healed col1 row0 | Out=eedd
+[PASS] healed col0 row1 | Out=7fff
+[PASS] healed col1 row1 | Out=f700
+[PASS] healed col2 row0 | Out=1c02
+[PASS] healed col3 row0 | Out=cb1b
+[PASS] healed col0 row2 | Out=d7f5
+[PASS] healed col1 row2 | Out=e1f0
+[PASS] healed col2 row1 | Out=0c93
+[PASS] healed col3 row1 | Out=dc2c
+[PASS] healed col0 row3 | Out=8000
+[PASS] healed col1 row3 | Out=b69a
+[PASS] healed col2 row2 | Out=3551
+[PASS] healed col3 row2 | Out=0404
+[PASS] healed col0 row4 | Out=d6a6
+[PASS] healed col1 row4 | Out=cc7a
+[PASS] healed col2 row3 | Out=af81
+[PASS] healed col3 row3 | Out=5edb
+[PASS] healed col0 row5 | Out=cca9
+[PASS] healed col1 row5 | Out=7fff
+[PASS] healed col2 row4 | Out=8d7d
+[PASS] healed col3 row4 | Out=7fff
+[PASS] healed col0 row6 | Out=f9d3
+[PASS] healed col1 row6 | Out=8000
+[PASS] healed col2 row5 | Out=115e
+[PASS] healed col3 row5 | Out=9e4d
+[PASS] healed col0 row7 | Out=0766
+[PASS] healed col1 row7 | Out=f0df
+[PASS] healed col2 row6 | Out=3403
+[PASS] healed col3 row6 | Out=05d7
+[PASS] healed col2 row7 | Out=7fff
+[PASS] healed col3 row7 | Out=8b16
+
+========================================
+Test Summary:
+Total Checks: 71
+Passed      : 71
+Failed      : 0
+========================================
+>>> ALL TESTS PASSED <<<
+
+tb/tb_self_healing.sv:224: $finish called at 1490000 (1ps)
+==> [6/11] Icarus 仿真: AXI4-Stream IP (随机反压 + 故障注入)
+
+========================================
+AXI4-Stream Array IP Testbench (N=4)
+========================================
+
+--- P1: weights + matrix 1 ---
+[PASS] out beat 0 | tdata=e6d5428b14485034 tlast=0
+[PASS] out beat 1 | tdata=c0132f4d59ad6b37 tlast=0
+[PASS] out beat 2 | tdata=287cb6c36497c6e8 tlast=0
+[PASS] out beat 3 | tdata=c89083c87fffd48e tlast=0
+[PASS] out beat 4 | tdata=09957fff9d347fff tlast=0
+[PASS] out beat 5 | tdata=aff4e92cd446fe70 tlast=1
+--- P2: inject fault @ physical col 2, heal via command beat ---
+[PASS] P2.1 fault detected
+[PASS] P2.2 fault_col == 2
+[PASS] P2.3 healed
+[PASS] P2.4 not unhealable
+--- P3: reload weights + matrix 2 (healed) ---
+[PASS] out beat 6 | tdata=e6d5428b14485034 tlast=0
+[PASS] out beat 7 | tdata=c0132f4d59ad6b37 tlast=0
+[PASS] out beat 8 | tdata=287cb6c36497c6e8 tlast=0
+[PASS] out beat 9 | tdata=c89083c87fffd48e tlast=0
+[PASS] out beat 10 | tdata=09957fff9d347fff tlast=0
+[PASS] out beat 11 | tdata=aff4e92cd446fe70 tlast=1
+[PASS] output beat count == 12
+
+========================================
+Test Summary:
+Total Checks: 17
+Passed      : 17
+Failed      : 0
+========================================
+>>> ALL TESTS PASSED <<<
+
+tb/tb_axi_stream_array.sv:214: $finish called at 2410000 (1ps)
+==> [7/11] Icarus 仿真: ABFT x 零掩蔽 对齐契约证据 TB (peer review 证据平台)
+=======================================================
+tb_abft_zero_mask_align  (N=4, 对齐契约证据 TB)
+=======================================================
+--- Phase A: fault-free, exact means, varying row means ---
+  [probe] t=7 c_flat=1400 1200 1000 0 v=0111 chkv=0 c_chk=0 | align=0 0 0 0 all=0 | sum_r=0 chk_r=0 vld=0 pulse=0 eabs=0 | od=0 0 0 0
+  [probe] t=8 c_flat=1600 1400 1200 1000 v=1111 chkv=0 c_chk=0 | align=1000 1000 1000 1000 all=1 | sum_r=0 chk_r=0 vld=0 pulse=0 eabs=0 | od=0 0 0 0
+  [trace] t=9 out_row=0 err_pulse=0 err_abs=0 od=1000 1000 1000 1000
+  [probe] t=9 c_flat=1800 1600 1400 1200 v=1111 chkv=1 c_chk=1000 | align=1200 1200 1200 1200 all=1 | sum_r=4000 chk_r=1000 vld=1 pulse=0 eabs=0 | od=1000 1000 1000 1000
+  [trace] t=10 out_row=1 err_pulse=0 err_abs=0 od=1200 1200 1200 1200
+  [probe] t=10 c_flat=2000 1800 1600 1400 v=1111 chkv=1 c_chk=1200 | align=1400 1400 1400 1400 all=1 | sum_r=4800 chk_r=1200 vld=1 pulse=0 eabs=0 | od=1200 1200 1200 1200
+  [trace] t=11 out_row=2 err_pulse=0 err_abs=0 od=1400 1400 1400 1400
+  [probe] t=11 c_flat=2000 2000 1800 1600 v=1110 chkv=1 c_chk=1400 | align=1600 1600 1600 1600 all=1 | sum_r=5600 chk_r=1400 vld=1 pulse=0 eabs=0 | od=1400 1400 1400 1400
+  [trace] t=12 out_row=3 err_pulse=0 err_abs=0 od=1600 1600 1600 1600
+  [probe] t=12 c_flat=2000 2000 2000 1800 v=1100 chkv=1 c_chk=1600 | align=1800 1800 1800 1800 all=1 | sum_r=6400 chk_r=1600 vld=1 pulse=0 eabs=0 | od=1600 1600 1600 1600
+  [trace] t=13 out_row=4 err_pulse=0 err_abs=0 od=1800 1800 1800 1800
+  [probe] t=13 c_flat=2000 2000 2000 2000 v=1000 chkv=1 c_chk=1800 | align=2000 2000 2000 2000 all=1 | sum_r=7200 chk_r=1800 vld=1 pulse=0 eabs=0 | od=1800 1800 1800 1800
+  [trace] t=14 out_row=5 err_pulse=0 err_abs=0 od=2000 2000 2000 2000
+  [probe] t=14 c_flat=2000 2000 2000 2000 v=0000 chkv=1 c_chk=2000 | align=2000 2000 2000 2000 all=0 | sum_r=8000 chk_r=2000 vld=1 pulse=0 eabs=0 | od=2000 2000 2000 2000
+  [probe] t=15 c_flat=2000 2000 2000 2000 v=0000 chkv=0 c_chk=2000 | align=2000 2000 2000 2000 all=0 | sum_r=8000 chk_r=2000 vld=0 pulse=0 eabs=0 | od=2000 2000 2000 2000
+  [probe] t=16 c_flat=2000 2000 2000 2000 v=0000 chkv=0 c_chk=2000 | align=2000 2000 2000 2000 all=0 | sum_r=8000 chk_r=2000 vld=0 pulse=0 eabs=0 | od=2000 2000 2000 2000
+--- Phase A summary: pulses=0 false_pos=0 baddata=0 badvalid=0 (期望全 0) ---
+--- Phase B: single-column fault @ (row2,col1) delta=500 ---
+  [trace] t=49 out_row=0 err_pulse=0 err_abs=0 od=1000 1000 1000 1000
+  [trace] t=50 out_row=1 err_pulse=0 err_abs=0 od=1000 1000 1000 1000
+  [trace] t=51 out_row=2 err_pulse=1 err_abs=500 od=0 0 0 0
+  [trace] t=52 out_row=3 err_pulse=0 err_abs=0 od=1000 1000 1000 1000
+  [trace] t=53 out_row=4 err_pulse=0 err_abs=0 od=1000 1000 1000 1000
+  [trace] t=54 out_row=5 err_pulse=0 err_abs=0 od=1000 1000 1000 1000
+--- Phase B summary: pulses=1 leak=0 overmask=0 badvalid=0 ---
+    Phase B pulse beats:
+      pulse @ t=51 (out(FR)=51, out(FR+1)=52)
+=======================================================
+>>> REVIEW-TB: PASS — 斜切对齐/同拍掩蔽契约满足 <<<
+=======================================================
+tb/tb_abft_zero_mask_align.sv:247: $finish called at 640000 (1ps)
+==> [8/11] Verilator 动态断言仿真: MAC 单元 (SVA)
+
+========================================
+Starting MAC Unit Testbench...
+========================================
+
+[PASS] 1. Reset Test
+[PASS] 2. Basic Multiply (0.5 * 0.5) | Out=2000 Valid=1
+[PASS] 3. Negative Multiply (-0.5 * 0.5) | Out=e000 Valid=1
+[PASS] 4. Accumulate Test (0.25 + 0.5) | Out=6000 Valid=1
+[PASS] 5. Positive Saturation | Out=7fff Valid=1
+[PASS] 6. Negative Saturation | Out=8000 Valid=1
+[PASS] 7. Special Case A=B=16'h8000 | Out=7fff Valid=1
+[PASS] 8. Zero Inputs | Out=0000 Valid=1
+[PASS] 9. Pipeline 0 | Out=2000 Valid=1
+[PASS] 9. Pipeline 1 | Out=e000 Valid=1
+[PASS] 9. Pipeline 2 | Out=0800 Valid=1
+[PASS] 9. Pipeline 3 | Out=f800 Valid=1
+[PASS] 10. Valid Gating - Setup | Out=2000 Valid=1
+[PASS] 10. Valid Gating | Out held=2000
+[PASS] 11.1 RNE: G=1, St=0, L=0 (Round even down) | Out=0002 Valid=1
+[PASS] 11.2 RNE: G=1, St=0, L=1 (Round even up) | Out=0004 Valid=1
+[PASS] 11.3 RNE: G=1, St=1, L=0 (Round up) | Out=0003 Valid=1
+[PASS] 20.1 Golden Vector | Out=7fff Valid=1
+[PASS] 20.2 Golden Vector | Out=7fff Valid=1
+[PASS] 20.3 Golden Vector | Out=7fff Valid=1
+[PASS] 20.4 Golden Vector | Out=7ffe Valid=1
+[PASS] 20.5 Golden Vector | Out=8001 Valid=1
+[PASS] 20.6 Golden Vector | Out=7fff Valid=1
+[PASS] 20.7 Golden Vector | Out=8000 Valid=1
+[PASS] 20.8 Golden Vector | Out=0000 Valid=1
+[PASS] 20.9 Golden Vector | Out=0002 Valid=1
+[PASS] 20.10 Golden Vector | Out=0002 Valid=1
+[PASS] 20.11 Golden Vector | Out=0000 Valid=1
+[PASS] 20.12 Golden Vector | Out=fffe Valid=1
+[PASS] 20.13 Golden Vector | Out=fffe Valid=1
+[PASS] 20.14 Golden Vector | Out=8000 Valid=1
+[PASS] 20.15 Golden Vector | Out=0000 Valid=1
+
+========================================
+Test Summary:
+Total Tests : 32
+Passed      : 32
+Failed      : 0
+========================================
+>>> ALL TESTS PASSED <<<
+
+- tb_mac_unit.sv:294: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.053 devel
+- Verilator: $finish at 1us; walltime 0.001 s; speed 859.094 us/s
+- Verilator: cpu 0.000 s on 1 threads; allocated 4 MB
+==> [9/11] Verilator 动态断言仿真: 脉动阵列 (SVA)
+
+========================================
+Starting Systolic Array Testbench (N=4)
+========================================
+
+[PASS] Reset Test
+--- Scenario 0: near-identity ---
+[PASS] S0 col0 row0 | Out=4000
+[PASS] S0 col0 row1 | Out=7ffe
+[PASS] S0 col1 row0 | Out=c000
+[PASS] S0 col0 row2 | Out=0000
+[PASS] S0 col1 row1 | Out=8001
+[PASS] S0 col2 row0 | Out=2000
+[PASS] S0 col0 row3 | Out=1234
+[PASS] S0 col1 row2 | Out=0000
+[PASS] S0 col2 row1 | Out=0001
+[PASS] S0 col3 row0 | Out=e000
+[PASS] S0 col0 row4 | Out=0001
+[PASS] S0 col1 row3 | Out=5677
+[PASS] S0 col2 row2 | Out=0000
+[PASS] S0 col3 row1 | Out=ffff
+[PASS] S0 col0 row5 | Out=ffff
+[PASS] S0 col1 row4 | Out=0002
+[PASS] S0 col2 row3 | Out=9abd
+[PASS] S0 col3 row2 | Out=0000
+[PASS] S0 col0 row6 | Out=7ffe
+[PASS] S0 col1 row5 | Out=fffe
+[PASS] S0 col2 row4 | Out=0004
+[PASS] S0 col3 row3 | Out=def0
+[PASS] S0 col0 row7 | Out=8001
+[PASS] S0 col1 row6 | Out=7ffe
+[PASS] S0 col2 row5 | Out=fffc
+[PASS] S0 col3 row4 | Out=0008
+[PASS] S0 col1 row7 | Out=8001
+[PASS] S0 col2 row6 | Out=7ffe
+[PASS] S0 col3 row5 | Out=fff8
+[PASS] S0 col2 row7 | Out=8001
+[PASS] S0 col3 row6 | Out=7ffe
+[PASS] S0 col3 row7 | Out=8001
+--- Scenario 1: all-max-pos saturate+ ---
+[PASS] S1 col0 row0 | Out=7fff
+[PASS] S1 col0 row1 | Out=7fff
+[PASS] S1 col1 row0 | Out=7fff
+[PASS] S1 col0 row2 | Out=7fff
+[PASS] S1 col1 row1 | Out=7fff
+[PASS] S1 col2 row0 | Out=7fff
+[PASS] S1 col0 row3 | Out=7fff
+[PASS] S1 col1 row2 | Out=7fff
+[PASS] S1 col2 row1 | Out=7fff
+[PASS] S1 col3 row0 | Out=7fff
+[PASS] S1 col0 row4 | Out=7fff
+[PASS] S1 col1 row3 | Out=7fff
+[PASS] S1 col2 row2 | Out=7fff
+[PASS] S1 col3 row1 | Out=7fff
+[PASS] S1 col0 row5 | Out=7fff
+[PASS] S1 col1 row4 | Out=7fff
+[PASS] S1 col2 row3 | Out=7fff
+[PASS] S1 col3 row2 | Out=7fff
+[PASS] S1 col0 row6 | Out=7fff
+[PASS] S1 col1 row5 | Out=7fff
+[PASS] S1 col2 row4 | Out=7fff
+[PASS] S1 col3 row3 | Out=7fff
+[PASS] S1 col0 row7 | Out=7fff
+[PASS] S1 col1 row6 | Out=7fff
+[PASS] S1 col2 row5 | Out=7fff
+[PASS] S1 col3 row4 | Out=7fff
+[PASS] S1 col1 row7 | Out=7fff
+[PASS] S1 col2 row6 | Out=7fff
+[PASS] S1 col3 row5 | Out=7fff
+[PASS] S1 col2 row7 | Out=7fff
+[PASS] S1 col3 row6 | Out=7fff
+[PASS] S1 col3 row7 | Out=7fff
+--- Scenario 2: (-1)x(-1) x4 guard-bits ---
+[PASS] S2 col0 row0 | Out=7fff
+[PASS] S2 col0 row1 | Out=7fff
+[PASS] S2 col1 row0 | Out=7fff
+[PASS] S2 col0 row2 | Out=7fff
+[PASS] S2 col1 row1 | Out=7fff
+[PASS] S2 col2 row0 | Out=7fff
+[PASS] S2 col0 row3 | Out=7fff
+[PASS] S2 col1 row2 | Out=7fff
+[PASS] S2 col2 row1 | Out=7fff
+[PASS] S2 col3 row0 | Out=7fff
+[PASS] S2 col0 row4 | Out=7fff
+[PASS] S2 col1 row3 | Out=7fff
+[PASS] S2 col2 row2 | Out=7fff
+[PASS] S2 col3 row1 | Out=7fff
+[PASS] S2 col0 row5 | Out=7fff
+[PASS] S2 col1 row4 | Out=7fff
+[PASS] S2 col2 row3 | Out=7fff
+[PASS] S2 col3 row2 | Out=7fff
+[PASS] S2 col0 row6 | Out=7fff
+[PASS] S2 col1 row5 | Out=7fff
+[PASS] S2 col2 row4 | Out=7fff
+[PASS] S2 col3 row3 | Out=7fff
+[PASS] S2 col0 row7 | Out=7fff
+[PASS] S2 col1 row6 | Out=7fff
+[PASS] S2 col2 row5 | Out=7fff
+[PASS] S2 col3 row4 | Out=7fff
+[PASS] S2 col1 row7 | Out=7fff
+[PASS] S2 col2 row6 | Out=7fff
+[PASS] S2 col3 row5 | Out=7fff
+[PASS] S2 col2 row7 | Out=7fff
+[PASS] S2 col3 row6 | Out=7fff
+[PASS] S2 col3 row7 | Out=7fff
+--- Scenario 3: all-max-neg saturate- ---
+[PASS] S3 col0 row0 | Out=8000
+[PASS] S3 col0 row1 | Out=8000
+[PASS] S3 col1 row0 | Out=8000
+[PASS] S3 col0 row2 | Out=8000
+[PASS] S3 col1 row1 | Out=8000
+[PASS] S3 col2 row0 | Out=8000
+[PASS] S3 col0 row3 | Out=8000
+[PASS] S3 col1 row2 | Out=8000
+[PASS] S3 col2 row1 | Out=8000
+[PASS] S3 col3 row0 | Out=8000
+[PASS] S3 col0 row4 | Out=8000
+[PASS] S3 col1 row3 | Out=8000
+[PASS] S3 col2 row2 | Out=8000
+[PASS] S3 col3 row1 | Out=8000
+[PASS] S3 col0 row5 | Out=8000
+[PASS] S3 col1 row4 | Out=8000
+[PASS] S3 col2 row3 | Out=8000
+[PASS] S3 col3 row2 | Out=8000
+[PASS] S3 col0 row6 | Out=8000
+[PASS] S3 col1 row5 | Out=8000
+[PASS] S3 col2 row4 | Out=8000
+[PASS] S3 col3 row3 | Out=8000
+[PASS] S3 col0 row7 | Out=8000
+[PASS] S3 col1 row6 | Out=8000
+[PASS] S3 col2 row5 | Out=8000
+[PASS] S3 col3 row4 | Out=8000
+[PASS] S3 col1 row7 | Out=8000
+[PASS] S3 col2 row6 | Out=8000
+[PASS] S3 col3 row5 | Out=8000
+[PASS] S3 col2 row7 | Out=8000
+[PASS] S3 col3 row6 | Out=8000
+[PASS] S3 col3 row7 | Out=8000
+--- Scenario 4: RNE midpoint odd/even ---
+[PASS] S4 col0 row0 | Out=0000
+[PASS] S4 col0 row1 | Out=0002
+[PASS] S4 col1 row0 | Out=0002
+[PASS] S4 col0 row2 | Out=0002
+[PASS] S4 col1 row1 | Out=0002
+[PASS] S4 col2 row0 | Out=0002
+[PASS] S4 col0 row3 | Out=0000
+[PASS] S4 col1 row2 | Out=0000
+[PASS] S4 col2 row1 | Out=0000
+[PASS] S4 col3 row0 | Out=0000
+[PASS] S4 col0 row4 | Out=fffe
+[PASS] S4 col1 row3 | Out=fffe
+[PASS] S4 col2 row2 | Out=fffe
+[PASS] S4 col3 row1 | Out=fffe
+[PASS] S4 col0 row5 | Out=fffe
+[PASS] S4 col1 row4 | Out=fffe
+[PASS] S4 col2 row3 | Out=fffe
+[PASS] S4 col3 row2 | Out=fffe
+[PASS] S4 col0 row6 | Out=0001
+[PASS] S4 col1 row5 | Out=0001
+[PASS] S4 col2 row4 | Out=0001
+[PASS] S4 col3 row3 | Out=0001
+[PASS] S4 col0 row7 | Out=ffff
+[PASS] S4 col1 row6 | Out=ffff
+[PASS] S4 col2 row5 | Out=ffff
+[PASS] S4 col3 row4 | Out=ffff
+[PASS] S4 col1 row7 | Out=0000
+[PASS] S4 col2 row6 | Out=0000
+[PASS] S4 col3 row5 | Out=0000
+[PASS] S4 col2 row7 | Out=0002
+[PASS] S4 col3 row6 | Out=0002
+[PASS] S4 col3 row7 | Out=0002
+--- Scenario 5: random full-range ---
+[PASS] S5 col0 row0 | Out=2b68
+[PASS] S5 col0 row1 | Out=e58e
+[PASS] S5 col1 row0 | Out=21b5
+[PASS] S5 col0 row2 | Out=2ab1
+[PASS] S5 col1 row1 | Out=d906
+[PASS] S5 col2 row0 | Out=5150
+[PASS] S5 col0 row3 | Out=edf8
+[PASS] S5 col1 row2 | Out=0e46
+[PASS] S5 col2 row1 | Out=d88c
+[PASS] S5 col3 row0 | Out=35d6
+[PASS] S5 col0 row4 | Out=7f43
+[PASS] S5 col1 row3 | Out=2439
+[PASS] S5 col2 row2 | Out=29f5
+[PASS] S5 col3 row1 | Out=b966
+[PASS] S5 col0 row5 | Out=b712
+[PASS] S5 col1 row4 | Out=4213
+[PASS] S5 col2 row3 | Out=557c
+[PASS] S5 col3 row2 | Out=5c27
+[PASS] S5 col0 row6 | Out=2965
+[PASS] S5 col1 row5 | Out=a810
+[PASS] S5 col2 row4 | Out=d407
+[PASS] S5 col3 row3 | Out=403f
+[PASS] S5 col0 row7 | Out=4ea4
+[PASS] S5 col1 row6 | Out=0c4b
+[PASS] S5 col2 row5 | Out=d4ed
+[PASS] S5 col3 row4 | Out=0b65
+[PASS] S5 col1 row7 | Out=684b
+[PASS] S5 col2 row6 | Out=3256
+[PASS] S5 col3 row5 | Out=e14a
+[PASS] S5 col2 row7 | Out=3a57
+[PASS] S5 col3 row6 | Out=2f20
+[PASS] S5 col3 row7 | Out=4878
+
+========================================
+Test Summary:
+Total Checks: 193
+Passed      : 193
+Failed      : 0
+========================================
+>>> ALL TESTS PASSED <<<
+
+- tb_systolic_array.sv:173: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.053 devel
+- Verilator: $finish at 1us; walltime 0.001 s; speed 1.155 ms/s
+- Verilator: cpu 0.000 s on 1 threads; allocated 4 MB
+==> [10/11] Verilator 动态断言仿真: 自愈阵列 (SVA + 故障注入)
+
+========================================
+Self-Healing Systolic Array Testbench (N=4)
+========================================
+
+--- Phase A: power-on BIST (expect healthy) ---
+[PASS] A.1 no fault detected
+[PASS] A.2 not healed
+[PASS] A.3 not unhealable
+--- Mission: healthy ---
+[PASS] healthy col0 row0 | Out=47bc
+[PASS] healthy col1 row0 | Out=eedd
+[PASS] healthy col2 row0 | Out=1c02
+[PASS] healthy col3 row0 | Out=cb1b
+[PASS] healthy col0 row1 | Out=7fff
+[PASS] healthy col1 row1 | Out=f700
+[PASS] healthy col2 row1 | Out=0c93
+[PASS] healthy col3 row1 | Out=dc2c
+[PASS] healthy col0 row2 | Out=d7f5
+[PASS] healthy col1 row2 | Out=e1f0
+[PASS] healthy col2 row2 | Out=3551
+[PASS] healthy col3 row2 | Out=0404
+[PASS] healthy col0 row3 | Out=8000
+[PASS] healthy col1 row3 | Out=b69a
+[PASS] healthy col2 row3 | Out=af81
+[PASS] healthy col3 row3 | Out=5edb
+[PASS] healthy col0 row4 | Out=d6a6
+[PASS] healthy col1 row4 | Out=cc7a
+[PASS] healthy col2 row4 | Out=8d7d
+[PASS] healthy col3 row4 | Out=7fff
+[PASS] healthy col0 row5 | Out=cca9
+[PASS] healthy col1 row5 | Out=7fff
+[PASS] healthy col2 row5 | Out=115e
+[PASS] healthy col3 row5 | Out=9e4d
+[PASS] healthy col0 row6 | Out=f9d3
+[PASS] healthy col1 row6 | Out=8000
+[PASS] healthy col2 row6 | Out=3403
+[PASS] healthy col3 row6 | Out=05d7
+[PASS] healthy col0 row7 | Out=0766
+[PASS] healthy col1 row7 | Out=f0df
+[PASS] healthy col2 row7 | Out=7fff
+[PASS] healthy col3 row7 | Out=8b16
+--- Phase B: inject stuck fault @ physical col 2 ---
+[PASS] B.1 fault detected
+[PASS] B.2 fault_col == 2
+[PASS] B.3 healed
+[PASS] B.4 not unhealable
+--- Mission: healed ---
+[PASS] healed col0 row0 | Out=47bc
+[PASS] healed col1 row0 | Out=eedd
+[PASS] healed col0 row1 | Out=7fff
+[PASS] healed col1 row1 | Out=f700
+[PASS] healed col2 row0 | Out=1c02
+[PASS] healed col3 row0 | Out=cb1b
+[PASS] healed col0 row2 | Out=d7f5
+[PASS] healed col1 row2 | Out=e1f0
+[PASS] healed col2 row1 | Out=0c93
+[PASS] healed col3 row1 | Out=dc2c
+[PASS] healed col0 row3 | Out=8000
+[PASS] healed col1 row3 | Out=b69a
+[PASS] healed col2 row2 | Out=3551
+[PASS] healed col3 row2 | Out=0404
+[PASS] healed col0 row4 | Out=d6a6
+[PASS] healed col1 row4 | Out=cc7a
+[PASS] healed col2 row3 | Out=af81
+[PASS] healed col3 row3 | Out=5edb
+[PASS] healed col0 row5 | Out=cca9
+[PASS] healed col1 row5 | Out=7fff
+[PASS] healed col2 row4 | Out=8d7d
+[PASS] healed col3 row4 | Out=7fff
+[PASS] healed col0 row6 | Out=f9d3
+[PASS] healed col1 row6 | Out=8000
+[PASS] healed col2 row5 | Out=115e
+[PASS] healed col3 row5 | Out=9e4d
+[PASS] healed col0 row7 | Out=0766
+[PASS] healed col1 row7 | Out=f0df
+[PASS] healed col2 row6 | Out=3403
+[PASS] healed col3 row6 | Out=05d7
+[PASS] healed col2 row7 | Out=7fff
+[PASS] healed col3 row7 | Out=8b16
+
+========================================
+Test Summary:
+Total Checks: 71
+Passed      : 71
+Failed      : 0
+========================================
+>>> ALL TESTS PASSED <<<
+
+- tb_self_healing.sv:224: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.053 devel
+- Verilator: $finish at 1us; walltime 0.001 s; speed 1.293 ms/s
+- Verilator: cpu 0.000 s on 1 threads; allocated 4 MB
+==> [11/11] Verilator 动态断言仿真: AXI4-Stream IP (全部 SVA + 随机反压 + 故障注入)
+
+========================================
+AXI4-Stream Array IP Testbench (N=4)
+========================================
+
+--- P1: weights + matrix 1 ---
+[PASS] out beat 0 | tdata=e6d5428b14485034 tlast=0
+[PASS] out beat 1 | tdata=c0132f4d59ad6b37 tlast=0
+[PASS] out beat 2 | tdata=287cb6c36497c6e8 tlast=0
+[PASS] out beat 3 | tdata=c89083c87fffd48e tlast=0
+[PASS] out beat 4 | tdata=09957fff9d347fff tlast=0
+[PASS] out beat 5 | tdata=aff4e92cd446fe70 tlast=1
+--- P2: inject fault @ physical col 2, heal via command beat ---
+[PASS] P2.1 fault detected
+[PASS] P2.2 fault_col == 2
+[PASS] P2.3 healed
+[PASS] P2.4 not unhealable
+--- P3: reload weights + matrix 2 (healed) ---
+[PASS] out beat 6 | tdata=e6d5428b14485034 tlast=0
+[PASS] out beat 7 | tdata=c0132f4d59ad6b37 tlast=0
+[PASS] out beat 8 | tdata=287cb6c36497c6e8 tlast=0
+[PASS] out beat 9 | tdata=c89083c87fffd48e tlast=0
+[PASS] out beat 10 | tdata=09957fff9d347fff tlast=0
+[PASS] out beat 11 | tdata=aff4e92cd446fe70 tlast=1
+[PASS] output beat count == 12
+
+========================================
+Test Summary:
+Total Checks: 17
+Passed      : 17
+Failed      : 0
+========================================
+>>> ALL TESTS PASSED <<<
+
+- tb_axi_stream_array.sv:214: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.053 devel
+- Verilator: $finish at 3us; walltime 0.001 s; speed 2.731 ms/s
+- Verilator: cpu 0.000 s on 1 threads; allocated 4 MB
+==> 全部阶段完成

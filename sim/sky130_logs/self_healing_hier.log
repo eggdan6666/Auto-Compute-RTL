@@ -1,0 +1,46 @@
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.69+272 (git sha1 230fb23f8, Release, Clang /usr/bin/clang++ 21.1.8)
+
+-- Running command `read_verilog -sv rtl/systolic_pe.sv rtl/rne_sat16.sv rtl/systolic_array.sv rtl/misr16.sv rtl/bist_controller.sv rtl/self_healing_array.sv; ; hierarchy -top self_healing_array; proc; opt; techmap; opt; stat' --
+
+1. Executing Verilog-2005 frontend: rtl/systolic_pe.sv
+Parsing SystemVerilog input from `rtl/systolic_pe.sv' to AST representation.
+Generating RTLIL representation for module `\systolic_pe'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: rtl/rne_sat16.sv
+Parsing SystemVerilog input from `rtl/rne_sat16.sv' to AST representation.
+Generating RTLIL representation for module `\rne_sat16'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: rtl/systolic_array.sv
+Parsing SystemVerilog input from `rtl/systolic_array.sv' to AST representation.
+Generating RTLIL representation for module `\systolic_array'.
+Warning: Replacing memory \pv_v with list of registers. See rtl/systolic_array.sv:96
+Warning: Replacing memory \p_v with list of registers. See rtl/systolic_array.sv:95
+Warning: Replacing memory \av_h with list of registers. See rtl/systolic_array.sv:91
+Warning: Replacing memory \a_h with list of registers. See rtl/systolic_array.sv:90
+Warning: Replacing memory \g_skew[3].g_delay.vly with list of registers. See rtl/systolic_array.sv:59
+Warning: Replacing memory \g_skew[3].g_delay.dly with list of registers. See rtl/systolic_array.sv:58
+Warning: Replacing memory \g_skew[2].g_delay.vly with list of registers. See rtl/systolic_array.sv:59
+Warning: Replacing memory \g_skew[2].g_delay.dly with list of registers. See rtl/systolic_array.sv:58
+Warning: Replacing memory \g_skew[1].g_delay.vly with list of registers. See rtl/systolic_array.sv:59
+Warning: Replacing memory \g_skew[1].g_delay.dly with list of registers. See rtl/systolic_array.sv:58
+Warning: Replacing memory \v_skew with list of registers. See rtl/systolic_array.sv:51
+Warning: Replacing memory \a_skew with list of registers. See rtl/systolic_array.sv:50
+Successfully finished Verilog frontend.
+
+4. Executing Verilog-2005 frontend: rtl/misr16.sv
+Parsing SystemVerilog input from `rtl/misr16.sv' to AST representation.
+Generating RTLIL representation for module `\misr16'.
+Successfully finished Verilog frontend.
+
+5. Executing Verilog-2005 frontend: rtl/bist_controller.sv
+rtl/bist_controller.sv:50: ERROR:Can not open file `bist_weights.hex` for \$readmemh.
+Parsing SystemVerilog input from `rtl/bist_controller.sv' to AST representation.
+Generating RTLIL representation for module `\bist_controller'.
