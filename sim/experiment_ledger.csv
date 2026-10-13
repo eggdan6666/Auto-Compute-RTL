@@ -1,0 +1,5 @@
+scenario,inj_phys_col,inj_phys_row,transient_cnt,detect_latency,repair_latency,total_mttr,healed,fault_col,pass
+A_transient,0,0,2,0,0,0,0,5,1
+B_hardfault,1,1,2,2,59,61,1,1,1
+A_transient,0,0,2,0,0,0,0,5,1
+B_hardfault,1,1,2,2,59,61,1,1,1

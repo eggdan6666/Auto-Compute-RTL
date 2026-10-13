@@ -34,7 +34,12 @@ module self_healing_array #(
     output logic              fault_detected, // 曾检测到故障
     output logic              healed,         // 故障已通过重映射隔离
     output logic              unhealable,     // 二次故障, 备用列耗尽
-    output logic [4:0]        fault_col       // 故障物理列号 (N+1 表示无)
+    output logic [4:0]        fault_col,      // 故障物理列号 (N+1 表示无)
+    // Phase 2: 外循环闭环 MTTR 量化测量端口 (论文/验收用)
+    output logic [15:0]       detect_latency, // 首个错误 -> trigger_heal 周期数
+    output logic [15:0]       repair_latency, // trigger_heal -> healed 周期数
+    output logic [15:0]       total_mttr,     // 检测 -> 自愈就绪 总恢复时延
+    output logic [31:0]       transient_cnt   // 累积吸收瞬态脉冲总数
 );
 
     localparam int NPC      = N + 1;
@@ -68,6 +73,16 @@ module self_healing_array #(
     logic               abft_err;               // u_abft.error_pulse (整拍污染脉冲)
     logic signed [15:0] abft_abs;               // u_abft.err_abs (调试观测)
     logic signed [15:0] chk_w [N];              // 每行校验权重 = 行均值 ΣW/N
+
+    // -------------------------------------------------------------------------
+    // Phase 2: 故障裁决器 + MTTR 测量
+    // -------------------------------------------------------------------------
+    logic        arb_trigger_heal;              // 裁决器 1 拍硬故障触发脉冲
+    logic [31:0] arb_transient;                 // 裁决器瞬态吸收计数
+    logic        first_err_seen;                // 检测时延: 首个错误已观测
+    logic [15:0] detect_cnt;                    // 检测时延计数
+    logic        repair_running;                // 修复时延: 进行中
+    logic [15:0] repair_cnt;                    // 修复时延计数
     logic [N-1:0]       raw_valid_out;          // 重映射后的逻辑列原始有效位
     logic [N*16-1:0]    raw_c_flat;             // 重映射后的逻辑列原始输出
 
@@ -184,6 +199,19 @@ module self_healing_array #(
         .err_abs    (abft_abs)
     );
 
+    // -------------------------------------------------------------------------
+    // Phase 2 故障去抖裁决器: 滑动窗内统计 abft_err, 区分瞬态 / 硬故障
+    // -------------------------------------------------------------------------
+    fault_arbiter #(.WINDOW_SIZE(32), .THRESH(3)) u_arb (
+        .clk          (clk),
+        .rst_n        (rst_n),
+        .err_pulse    (abft_err),
+        .busy         (busy),
+        .trigger_heal (arb_trigger_heal),
+        .transient_cnt(arb_transient)
+    );
+    assign transient_cnt = arb_transient;
+
     generate
         for (genvar c = 0; c < N; c++) begin : g_mask
             zero_mask #(.DLY(N - c + 1)) u_zm (
@@ -217,7 +245,7 @@ module self_healing_array #(
 
             case (hstate)
                 H_IDLE: begin
-                    if (heal_start) begin
+                    if (heal_start || arb_trigger_heal) begin
                         bist_start <= 1'b1;
                         hstate     <= H_BIST1;
                     end
@@ -249,6 +277,49 @@ module self_healing_array #(
 
                 default: hstate <= H_IDLE;
             endcase
+        end
+    end
+
+    // -------------------------------------------------------------------------
+    // Phase 2: MTTR 周期精确测量
+    //   detect_latency = 首个注入错误拍 -> trigger_heal 拍 (含首尾)
+    //   repair_latency = trigger_heal 拍 -> healed 置位拍 (含首尾)
+    //   total_mttr     = detect_latency + repair_latency
+    // -------------------------------------------------------------------------
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            first_err_seen <= 1'b0;
+            detect_cnt     <= 16'h0;
+            detect_latency <= 16'h0;
+            repair_running <= 1'b0;
+            repair_cnt     <= 16'h0;
+            repair_latency <= 16'h0;
+            total_mttr     <= 16'h0;
+        end else begin
+            // 检测时延: 首个错误 -> trigger_heal
+            if (arb_trigger_heal && first_err_seen) begin
+                detect_latency <= detect_cnt;
+                first_err_seen <= 1'b0;
+            end else if (!busy && fault_col_r == NO_FAULT[4:0] && abft_err && !first_err_seen) begin
+                first_err_seen <= 1'b1;
+                detect_cnt     <= 16'd1;
+            end else if (first_err_seen && !busy) begin
+                detect_cnt <= detect_cnt + 16'd1;
+            end
+
+            // 修复时延: trigger_heal -> healed
+            if (arb_trigger_heal && !repair_running) begin
+                repair_running <= 1'b1;
+                repair_cnt     <= 16'd1;
+            end else if (repair_running && !healed) begin
+                repair_cnt <= repair_cnt + 16'd1;
+            end
+
+            if (repair_running && healed) begin
+                repair_latency <= repair_cnt;
+                total_mttr     <= detect_latency + repair_cnt;
+                repair_running <= 1'b0;
+            end
         end
     end
 
