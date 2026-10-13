@@ -35,7 +35,7 @@ verilate_and_run () {  # $1=工作目录 $2=顶层模块 $3=输出名 $4...=源�
       && ./obj_dir/"$out".exe )
 }
 
-echo "==> [1/11] 重新生成黄金向量 (Python Golden Oracle)"
+echo "==> [1/12] 重新生成黄金向量 (Python Golden Oracle)"
 python golden_model.py > /dev/null
 python golden_array.py > /dev/null
 python golden_bist.py  > /dev/null
@@ -43,7 +43,7 @@ python golden_axi.py   > /dev/null
 
 export PATH="$OSS_BIN:$OSS_LIB:$PATH"
 
-echo "==> [2/11] Icarus 编译 MAC + 脉动阵列 + 自愈阵列 + AXI IP"
+echo "==> [2/12] Icarus 编译 MAC + 脉动阵列 + 自愈阵列 + AXI IP + Phase2"
 mkdir -p sim
 iverilog -g2012 -o sim/tb_mac_unit.vvp rtl/mac_unit.sv tb/tb_mac_unit.sv 2>&1 | grep -v "sorry:" || true
 iverilog -g2012 -o sim/tb_systolic_array.vvp \

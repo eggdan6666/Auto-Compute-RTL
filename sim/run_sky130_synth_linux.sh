@@ -26,7 +26,7 @@ run_synth () {  # $1=顶层 $2=日志名 $3=chparam(可空) $4...=源文件
 run_synth mac_unit            mac_unit      "" rtl/mac_unit.sv
 run_synth systolic_array      array4        "chparam -set NR 4 -set NC 4 systolic_array" rtl/systolic_pe.sv rtl/rne_sat16.sv rtl/systolic_array.sv
 run_synth systolic_array      array8        "chparam -set NR 8 -set NC 8 systolic_array" rtl/systolic_pe.sv rtl/rne_sat16.sv rtl/systolic_array.sv
-run_synth self_healing_array  self_healing  "" rtl/systolic_pe.sv rtl/rne_sat16.sv rtl/systolic_array.sv rtl/misr16.sv rtl/bist_controller.sv rtl/self_healing_array.sv
-run_synth axi_stream_array    axi_ip        "" rtl/systolic_pe.sv rtl/rne_sat16.sv rtl/systolic_array.sv rtl/misr16.sv rtl/bist_controller.sv rtl/self_healing_array.sv rtl/axi_stream_array.sv
+run_synth self_healing_array  self_healing  "" rtl/systolic_pe.sv rtl/rne_sat16.sv rtl/systolic_array.sv rtl/misr16.sv rtl/bist_controller.sv rtl/fault_arbiter.sv rtl/abft_checksum.sv rtl/zero_mask.sv rtl/self_healing_array.sv
+run_synth axi_stream_array    axi_ip        "" rtl/systolic_pe.sv rtl/rne_sat16.sv rtl/systolic_array.sv rtl/misr16.sv rtl/bist_controller.sv rtl/fault_arbiter.sv rtl/abft_checksum.sv rtl/zero_mask.sv rtl/self_healing_array.sv rtl/axi_stream_array.sv
 
 echo "==> 完成: sim/sky130_logs/"

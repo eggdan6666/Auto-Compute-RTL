@@ -1,0 +1,6 @@
+*.vvp
+*.log
+obj_dir/
+sim/sky130_logs/
+__pycache__/
+*.pyc

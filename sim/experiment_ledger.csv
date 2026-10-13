@@ -3,3 +3,7 @@ A_transient,0,0,2,0,0,0,0,5,1
 B_hardfault,1,1,2,2,59,61,1,1,1
 A_transient,0,0,2,0,0,0,0,5,1
 B_hardfault,1,1,2,2,59,61,1,1,1
+A_transient,0,0,2,0,0,0,0,5,1
+B_hardfault,1,1,2,2,59,61,1,1,1
+A_transient,0,0,2,0,0,0,0,5,1
+B_hardfault,1,1,2,2,59,61,1,1,1
