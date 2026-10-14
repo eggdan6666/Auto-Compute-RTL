@@ -261,7 +261,8 @@ def train_one_epoch(model, loader, optimizer, criterion, device):
     model.train()
     running_loss = 0.0
     n = 0
-    for x, y in loader:
+    total_batches = len(loader)
+    for i, (x, y) in enumerate(loader):
         x, y = x.to(device), y.to(device)
         optimizer.zero_grad()
         logits = model(x)
@@ -270,6 +271,8 @@ def train_one_epoch(model, loader, optimizer, criterion, device):
         optimizer.step()
         running_loss += loss.item() * y.size(0)
         n += y.size(0)
+        if (i + 1) % 50 == 0 or (i + 1) == total_batches:
+            print(f"  [batch {i+1:3d}/{total_batches}] loss={running_loss/n:.4f}", flush=True)
     return running_loss / n if n else 0.0
 
 
@@ -290,12 +293,15 @@ def main():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--quick", action="store_true", help="冒烟: 少量数据/批, 验证管线")
     parser.add_argument("--device", default=None)
+    parser.add_argument("--threads", type=int, default=12, help="CPU 训练线程数")
     args = parser.parse_args()
 
     torch.manual_seed(args.seed)
     device = torch.device(args.device) if args.device else (
         torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu"))
-    print(f"[INFO] device={device}  mode={args.mode}  epochs={args.epochs}")
+    if device.type == "cpu" and args.threads > 0:
+        torch.set_num_threads(args.threads)
+    print(f"[INFO] device={device} (threads={torch.get_num_threads() if device.type == 'cpu' else 'N/A'})  mode={args.mode}  epochs={args.epochs}")
 
     if args.quick:
         args.batch_size = 32

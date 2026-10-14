@@ -8,3 +8,6 @@ ECS_双平台使用与数据手册.md
 .env*
 data/
 sim/sim_transient
+*.pt
+*.pth
+*.bin
