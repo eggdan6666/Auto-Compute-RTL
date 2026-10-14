@@ -1,0 +1,31 @@
+Phase2 任务数据 W[0][:]=1000 2000 0800 f000 | EXP[0][:]=0300 0c80 0300 fa00
+===============================================================
+Phase 2 外循环闭环 + MTTR 量化验证 (N=4)
+===============================================================
+
+=== 场景 A: 瞬态软错误 (1 拍注入) ===
+[PASS] A.1 busy 恒 0 (不误停机)
+[PASS] A.2 transient_cnt 递增
+[PASS] A.3 零掩蔽生效 (err 拍 c_flat 全零)
+[PASS] A.4 未产生 fault_detected
+[PASS] A.5 未拉高 healed
+  [INFO] transient_cnt 增量 = 2 (掩蔽事件 2/2 正确)
+
+=== 场景 B: 永久硬故障 (自主闭环 + 热替换) ===
+[PASS] B.1 自主拉起 BIST 完成 (healed=1)
+[PASS] B.2 定位故障物理列 col=1
+[PASS] B.3 未耗尽备用列
+[PASS] B.4 detect_latency > 0
+[PASS] B.5 repair_latency > 0
+[PASS] B.6 total_mttr == detect + repair
+  [MTTR] detect_latency = 2 cycles
+  [MTTR] repair_latency = 75 cycles
+  [MTTR] total_mttr     = 77 cycles
+[PASS] B.7 自愈后任务输出与黄金一致
+
+===============================================================
+Phase 2 汇总: Total=12 Pass=12 Fail=0
+===============================================================
+>>> PHASE 2 CLOSED-LOOP TEST PASSED <<<
+
+tb/tb_phase2_closed_loop.sv:352: $finish called at 1520000 (1ps)

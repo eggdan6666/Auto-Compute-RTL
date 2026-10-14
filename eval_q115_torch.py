@@ -148,7 +148,7 @@ class Q115Linear(nn.Module):
         res = out_int.clone()
         if self.protection_mode == 'none':
             # 无防护基线: 故障位产生严重 SDC 污染 (stuck-at-0 或位翻转，幅值均匀分布)
-            noise = torch.randint_like(res, low=SAT_NEG, high=SAT_POS)
+            noise = torch.randint_like(res, low=SAT_NEG, high=SAT_POS + 1)
             res[fault_mask] = noise[fault_mask]
 
         elif self.protection_mode == 'zero_mask':
@@ -159,18 +159,19 @@ class Q115Linear(nn.Module):
             # 仅 BIST 重映射 (外循环): 瞬态故障无法及时处理，永久故障热替换
             # 假设 80% 为瞬态故障 (造成 SDC)，20% 为硬故障 (被热替换治愈)
             transient_mask = fault_mask & (torch.rand_like(out_int, dtype=torch.float32) < 0.8)
-            noise = torch.randint_like(res, low=SAT_NEG, high=SAT_POS)
+            noise = torch.randint_like(res, low=SAT_NEG, high=SAT_POS + 1)
             res[transient_mask] = noise[transient_mask]
 
         elif self.protection_mode == 'dual_loop':
             # 双循环完整版 (本工作):
             # 瞬态故障 -> 零掩蔽 100% 吸收 (置零)
-            # 永久硬故障 -> 故障裁决器触发 BIST (总 MTTR = 61 cycles) 热替换完全恢复
+            # 永久硬故障 -> 故障裁决器触发 BIST (总 MTTR = 77 cycles, detect=2 + repair=75, 周期距离) 热替换完全恢复
             # 仅在极高故障率导致备用列耗尽 (超额故障) 时产生极少量残余错误
-            unhealable_mask = fault_mask & (torch.rand_like(out_int, dtype=torch.float32) < (self.fault_rate * 2.0))
+            unhealable_p = min(1.0, float(self.fault_rate * 2.0))
+            unhealable_mask = fault_mask & (torch.rand_like(out_int, dtype=torch.float32) < unhealable_p)
             res[fault_mask] = 0  # 绝大部分被零掩蔽吸收
             if unhealable_mask.any():
-                res[unhealable_mask] = torch.randint_like(res, low=SAT_NEG, high=SAT_POS)[unhealable_mask]
+                res[unhealable_mask] = torch.randint_like(res, low=SAT_NEG, high=SAT_POS + 1)[unhealable_mask]
 
         return res
 
@@ -248,17 +249,18 @@ class Q115Conv2d(nn.Module):
 
         res = out_int.clone()
         if self.protection_mode == 'none':
-            noise = torch.randint_like(res, low=SAT_NEG, high=SAT_POS)
+            noise = torch.randint_like(res, low=SAT_NEG, high=SAT_POS + 1)
             res[fault_mask] = noise[fault_mask]
         elif self.protection_mode == 'zero_mask':
             res[fault_mask] = 0
         elif self.protection_mode == 'bist_reroute':
             transient_mask = fault_mask & (torch.rand_like(out_int, dtype=torch.float32) < 0.8)
-            noise = torch.randint_like(res, low=SAT_NEG, high=SAT_POS)
+            noise = torch.randint_like(res, low=SAT_NEG, high=SAT_POS + 1)
             res[transient_mask] = noise[transient_mask]
         elif self.protection_mode == 'dual_loop':
-            unhealable_mask = fault_mask & (torch.rand_like(out_int, dtype=torch.float32) < (self.fault_rate * 2.0))
+            unhealable_p = min(1.0, float(self.fault_rate * 2.0))
+            unhealable_mask = fault_mask & (torch.rand_like(out_int, dtype=torch.float32) < unhealable_p)
             res[fault_mask] = 0
             if unhealable_mask.any():
-                res[unhealable_mask] = torch.randint_like(res, low=SAT_NEG, high=SAT_POS)[unhealable_mask]
+                res[unhealable_mask] = torch.randint_like(res, low=SAT_NEG, high=SAT_POS + 1)[unhealable_mask]
         return res

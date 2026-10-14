@@ -3,8 +3,9 @@
 // =============================================================================
 // bist_controller.sv — 脉动阵列内建自测试 (BIST) 控制器
 //
-// 流程: IDLE -> LOAD_W (装载 BIST 物理权重 ROM) -> RUN (逐拍送入 MB 行激活)
-//       -> COLLECT (等待全部物理列回齐 MB 个结果) -> EVAL -> DONE
+// 流程: IDLE -> LOAD_W (装载 BIST 物理权重 ROM) -> DRAIN (排空在飞任务数据)
+//       -> RUN (逐拍送入 MB 行激活) -> COLLECT (等全部物理列回齐 MB 个结果)
+//       -> EVAL -> DONE
 //
 // 每物理列一个 MISR16 在线压缩输出; EVAL 时与 golden_bist.py 生成的
 // 黄金签名比对 (skip_col 指定的已知坏列除外), 输出最低故障物理列号。
@@ -55,13 +56,16 @@ module bist_controller #(
     // -------------------------------------------------------------------------
     // FSM
     // -------------------------------------------------------------------------
-    typedef enum logic [2:0] {S_IDLE, S_LOAD, S_RUN, S_COLLECT, S_EVAL} state_t;
+    typedef enum logic [2:0] {S_IDLE, S_LOAD, S_DRAIN, S_RUN, S_COLLECT, S_EVAL} state_t;
     state_t state;
 
-    logic [7:0] row_cnt;     // RUN: 当前发送行号
-    logic [7:0] drain_cnt;   // COLLECT: 排空计时
-    logic [7:0] rcvd [NPC];  // 每列已收结果数
+    logic [7:0] row_cnt;         // RUN: 当前发送行号
+    logic [7:0] drain_cnt;       // COLLECT: 排空计时
+    logic [7:0] drain_wait_cnt;  // DRAIN: 在飞任务数据排空等待计时
+    logic [7:0] rcvd [NPC];      // 每列已收结果数
     logic       misr_clear;
+    logic       misr_sample;     // MISR/接收计数采样使能 (仅 RUN/COLLECT, 排除 LOAD/DRAIN)
+    logic       arr_all_idle;    // arr_valid_out 全 0 => 阵列已排空
 
     // 阵列驱动: 纯组合, valid 与数据同拍
     always_comb begin
@@ -72,8 +76,12 @@ module bist_controller #(
         bist_valid  = (state == S_RUN);
     end
 
+    // F2: MISR 仅在 BIST 激励真正流经阵列时采样 (排除 LOAD/DRAIN 排空段)
+    assign misr_sample  = (state == S_RUN) || (state == S_COLLECT);
+    assign arr_all_idle = &(~arr_valid_out);
+
     // -------------------------------------------------------------------------
-    // 每列 MISR16 + 接收计数 (busy 期间常开)
+    // 每列 MISR16 + 接收计数 (misr_sample 期间采样, 排除 LOAD/DRAIN)
     // -------------------------------------------------------------------------
     logic [15:0] misr_state [NPC];
 
@@ -83,7 +91,7 @@ module bist_controller #(
                 .clk   (clk),
                 .rst_n (rst_n),
                 .clear (misr_clear),
-                .en    (busy && arr_valid_out[c]),
+                .en    (misr_sample && arr_valid_out[c]),
                 .data  (arr_c_flat[16*c +: 16]),
                 .state (misr_state[c])
             );
@@ -96,7 +104,7 @@ module bist_controller #(
             for (k = 0; k < NPC; k++) rcvd[k] <= 8'd0;
         end else if (misr_clear) begin
             for (k = 0; k < NPC; k++) rcvd[k] <= 8'd0;
-        end else if (busy) begin
+        end else if (misr_sample) begin
             for (k = 0; k < NPC; k++)
                 if (arr_valid_out[k]) rcvd[k] <= rcvd[k] + 8'd1;
         end
@@ -136,6 +144,7 @@ module bist_controller #(
             fail_col   <= 5'd0;
             row_cnt    <= 8'd0;
             drain_cnt  <= 8'd0;
+            drain_wait_cnt <= 8'd0;
             misr_clear <= 1'b0;
         end else begin
             misr_clear <= 1'b0;
@@ -153,7 +162,18 @@ module bist_controller #(
                 end
 
                 S_LOAD: begin
-                    state <= S_RUN;   // bist_load_w 本拍组合拉高, PE 锁存权重
+                    // bist_load_w 本拍组合拉高, PE 锁存权重; 转入排空等待 (F2)
+                    drain_wait_cnt <= 8'd0;
+                    state          <= S_DRAIN;
+                end
+
+                S_DRAIN: begin
+                    // F2: 等待在飞任务数据完全排空, 并在进入 S_RUN 前清零 MISR
+                    drain_wait_cnt <= drain_wait_cnt + 8'd1;
+                    if (drain_wait_cnt >= 8'd16 || (arr_all_idle && drain_wait_cnt >= 8'd6)) begin
+                        misr_clear <= 1'b1;
+                        state      <= S_RUN;
+                    end
                 end
 
                 S_RUN: begin

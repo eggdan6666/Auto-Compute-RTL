@@ -1,0 +1,4 @@
+WARNING: sim/review_p23/tb_rne_check.sv:37: $readmemh(sim/review_p23/rne_in.hex): Not enough words in the file for the requested range [0:4095].
+[rne-check] loaded 2602 vectors
+[rne-check] captured 2602 outputs (expect 2602) -> sim/review_p23/rne_out_rtl.hex
+sim/review_p23/tb_rne_check.sv:61: $finish called at 26085000 (1ps)

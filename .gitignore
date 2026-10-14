@@ -4,3 +4,7 @@ obj_dir/
 sim/sky130_logs/
 __pycache__/
 *.pyc
+ECS_双平台使用与数据手册.md
+.env*
+data/
+sim/sim_transient

@@ -24,7 +24,8 @@ MISR16 (Fibonacci, 与 rtl/misr16.sv 逐位一致):
 import random
 from golden_model import mac_golden, to_signed
 
-N   = 4       # 逻辑列数 (= 行数)
+import sys as _sys
+N   = int(_sys.argv[1]) if len(_sys.argv) > 1 else 4  # 逻辑列数 (= 行数)
 MB  = 16      # BIST 激活行数
 M   = 8       # 任务模式行数
 MISR_INIT = 0xACE1
@@ -71,8 +72,10 @@ def main():
 
     # --- 任务模式: 逻辑 N x N 权重 + M 行激活 ---
     W_m = [[rng.getrandbits(16) for _ in range(N)] for _ in range(N)]
+    edge_row1 = [0x4000, 0xC000, 0x2000, 0xE000, 0x1000, 0xF000, 0x0800, 0xF800][:N]
+    edge_row2 = [0x7FFF, 0x8000, 0x0001, 0xFFFF, 0x0002, 0xFFFE, 0x5555, 0xAAAA][:N]
     mission_rows = (
-        [[0x4000, 0xC000, 0x2000, 0xE000], [0x7FFF, 0x8000, 0x0001, 0xFFFF]]
+        [edge_row1, edge_row2]
         + [[rng.getrandbits(16) for _ in range(N)] for _ in range(M - 2)]
     )
     mission_vec = []
@@ -86,28 +89,28 @@ def main():
         mission_vec.append(v)
 
     # --- 写文件 ---
-    with open("bist_weights.hex", "w", encoding="ascii") as f:
+    with open(f"bist{N}_weights.hex", "w", encoding="ascii") as f:
         for r in range(N):
             for p in range(N + 1):
                 f.write(f"{W_b[r][p]:04X}\n")
 
-    with open("bist_rows.hex", "w", encoding="ascii") as f:
+    with open(f"bist{N}_rows.hex", "w", encoding="ascii") as f:
         for m in range(MB):
             v = 0
             for r in range(N):
                 v |= rows[m][r] << (16 * r)
             f.write(f"{v:0{N*4}X}\n")
 
-    with open("bist_golden.hex", "w", encoding="ascii") as f:
+    with open(f"bist{N}_golden.hex", "w", encoding="ascii") as f:
         for p in range(N + 1):
             f.write(f"{sigs[p]:04X}\n")
 
-    with open("mission_weights.hex", "w", encoding="ascii") as f:
+    with open(f"mission{N}_weights.hex", "w", encoding="ascii") as f:
         for r in range(N):
             for c in range(N):
                 f.write(f"{W_m[r][c]:04X}\n")
 
-    with open("mission_vectors.hex", "w", encoding="ascii") as f:
+    with open(f"mission{N}_vectors.hex", "w", encoding="ascii") as f:
         for m in range(M):
             f.write(f"{mission_vec[m]:0{2*N*4}X}\n")
 

@@ -1,0 +1,6 @@
+[GATE] G3a: PASS: detect_latency=2 (<=10), healed=1, fault_col=1
+[GATE] G3b: PASS: repair_latency=75 (<=80), detect=2, healed=1, fault_col=1
+[GATE] G4a: PASS: 无伪 unhealable/伪重映射 (healed=0, fault_col=5, unheal=0)
+[GATE] G4b: PASS: 持续灌流下正确自愈 (healed=1, fault_col=1, detect=2, repair=76)
+[GATE] tb_round2_gates: ALL SCENARIOS DONE
+sim/review_p23/tb_round2_gates.sv:217: $finish called at 10500000 (1ps)

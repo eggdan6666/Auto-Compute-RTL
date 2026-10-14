@@ -17,19 +17,22 @@ import random
 import csv
 import sys
 
+import sys as _sys
+NN = int(_sys.argv[1]) if len(_sys.argv) > 1 and _sys.argv[1].isdigit() else 4
 N_FAULT = 1000
 N_CTRL  = 100
 SEED    = 20261010
 
 
-def gen_fault_list(path="fault_list.hex"):
+def gen_fault_list(path=None):
+    path = path or f"fault_list{NN}.hex"
     rng = random.Random(SEED)
     lines = []
     # 故障场景
     for _ in range(N_FAULT):
         model = rng.choice([1, 1, 2])     # psum 卡死 2/3, 权重卡死 1/3
-        col   = rng.randrange(5)          # 含备用列 4
-        row   = rng.randrange(4)
+        col   = rng.randrange(NN + 1)      # 含备用列 NN
+        row   = rng.randrange(NN)
         val   = rng.getrandbits(40) if model == 1 else rng.getrandbits(16)
         entry = (model << 46) | (col << 43) | (row << 40) | val
         lines.append(f"{entry:012X}")
@@ -38,10 +41,11 @@ def gen_fault_list(path="fault_list.hex"):
         lines.append(f"{0:012X}")
     with open(path, "w", encoding="ascii") as f:
         f.write("\n".join(lines) + "\n")
-    print(f"fault_list.hex: {len(lines)} 场景 ({N_FAULT} 故障 + {N_CTRL} 对照), seed={SEED}")
+    print(f"{path}: {len(lines)} 场景 ({N_FAULT} 故障 + {N_CTRL} 对照), seed={SEED}, N={NN}")
 
 
-def aggregate(path="campaign_results.csv"):
+def aggregate(path=None):
+    path = path or f"campaign_results{NN}.csv"
     """列: id,model,col,row,val,pre_err,detected,loc_ok,healed,post_err"""
     rows = list(csv.DictReader(open(path, encoding="utf-8")))
     faults = [r for r in rows if int(r["model"]) != 0]

@@ -36,9 +36,9 @@ module self_healing_array #(
     output logic              unhealable,     // 二次故障, 备用列耗尽
     output logic [4:0]        fault_col,      // 故障物理列号 (N+1 表示无)
     // Phase 2: 外循环闭环 MTTR 量化测量端口 (论文/验收用)
-    output logic [15:0]       detect_latency, // 首个错误 -> trigger_heal 周期数
-    output logic [15:0]       repair_latency, // trigger_heal -> healed 周期数
-    output logic [15:0]       total_mttr,     // 检测 -> 自愈就绪 总恢复时延
+    output logic [15:0]       detect_latency, // 首个错误 -> trigger_heal 周期距离
+    output logic [15:0]       repair_latency, // trigger_heal -> healed 周期距离
+    output logic [15:0]       total_mttr,     // 检测 -> 自愈就绪 总恢复时延 (周期距离)
     output logic [31:0]       transient_cnt   // 累积吸收瞬态脉冲总数
 );
 
@@ -129,7 +129,9 @@ module self_healing_array #(
     assign bist_active = bist_busy;
 
     assign phy_load_w   = bist_active ? bist_load_w : load_w;
-    assign phy_valid_in = bist_active ? bist_valid  : valid_in;
+    // F2: 自愈期间(busy 拉高即)切断新任务流入, 避免任务数据混入 BIST/MISR。
+    //     注意 bist_active(bist_busy) 滞后 busy 1~2 拍, 故显式用 !busy 门控以封死空窗。
+    assign phy_valid_in = bist_active ? bist_valid  : (valid_in && !busy);
     assign phy_a_flat   = bist_active ? bist_a_flat : a_flat;
 
     // -------------------------------------------------------------------------
@@ -246,8 +248,10 @@ module self_healing_array #(
             case (hstate)
                 H_IDLE: begin
                     if (heal_start || arb_trigger_heal) begin
-                        bist_start <= 1'b1;
-                        hstate     <= H_BIST1;
+                        // F1: 下次自愈触发前严格清零 healed (粘滞标志改为触发前清哨)
+                        healed      <= 1'b0;
+                        bist_start  <= 1'b1;
+                        hstate      <= H_BIST1;
                     end
                 end
 
@@ -281,14 +285,17 @@ module self_healing_array #(
     end
 
     // -------------------------------------------------------------------------
-    // Phase 2: MTTR 周期精确测量
-    //   detect_latency = 首个注入错误拍 -> trigger_heal 拍 (含首尾)
-    //   repair_latency = trigger_heal 拍 -> healed 置位拍 (含首尾)
+    // Phase 2: MTTR 周期精确测量 (周期距离口径)
+    //   detect_latency = 首个注入错误拍 -> trigger_heal 拍 (T_trigger - T_first_err)
+    //   repair_latency = trigger_heal 拍 -> healed 置位拍 (T_healed - T_trigger)
     //   total_mttr     = detect_latency + repair_latency
     // -------------------------------------------------------------------------
+    logic [5:0] fes_silent_cnt;
+
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             first_err_seen <= 1'b0;
+            fes_silent_cnt <= 6'd0;
             detect_cnt     <= 16'h0;
             detect_latency <= 16'h0;
             repair_running <= 1'b0;
@@ -300,11 +307,26 @@ module self_healing_array #(
             if (arb_trigger_heal && first_err_seen) begin
                 detect_latency <= detect_cnt;
                 first_err_seen <= 1'b0;
+                fes_silent_cnt <= 6'd0;
             end else if (!busy && fault_col_r == NO_FAULT[4:0] && abft_err && !first_err_seen) begin
                 first_err_seen <= 1'b1;
+                fes_silent_cnt <= 6'd0;
                 detect_cnt     <= 16'd1;
             end else if (first_err_seen && !busy) begin
-                detect_cnt <= detect_cnt + 16'd1;
+                if (abft_err) begin
+                    fes_silent_cnt <= 6'd0;
+                    detect_cnt <= detect_cnt + 16'd1;
+                end else begin
+                    // F1: 连续 40 拍无错误脉冲: 判定为孤立瞬态, 超时清哨避免毒化
+                    if (fes_silent_cnt >= 6'd40) begin
+                        first_err_seen <= 1'b0;
+                        fes_silent_cnt <= 6'd0;
+                        detect_cnt     <= 16'd0;
+                    end else begin
+                        fes_silent_cnt <= fes_silent_cnt + 6'd1;
+                        detect_cnt     <= detect_cnt + 16'd1;
+                    end
+                end
             end
 
             // 修复时延: trigger_heal -> healed
@@ -319,6 +341,11 @@ module self_healing_array #(
                 repair_latency <= repair_cnt;
                 total_mttr     <= detect_latency + repair_cnt;
                 repair_running <= 1'b0;
+            end else if (repair_running && (hstate == H_IDLE) && !healed) begin
+                // F1: hstate 回到 H_IDLE 且未能置位 healed (BIST1 干净通过 / 不可愈),
+                //     强制清零 repair_running 阻断 repair_cnt 毒化虚涨。
+                repair_running <= 1'b0;
+                repair_cnt     <= 16'd0;
             end
         end
     end

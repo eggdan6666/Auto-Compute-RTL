@@ -1,0 +1,8 @@
+[CANFAIL] trial 0: 2-beat injection @ PE(0,0) -> pulses=2
+[CANFAIL][WARN] trial 0 触发 busy (2 拍 2 脉冲不应越阈 THRESH=3)
+[CANFAIL] trial 1: 2-beat injection @ PE(1,1) -> pulses=2
+[CANFAIL][WARN] trial 1 触发 busy (2 拍 2 脉冲不应越阈 THRESH=3)
+[CANFAIL] trial 2: 2-beat injection @ PE(2,2) -> pulses=2
+[CANFAIL][WARN] trial 2 触发 busy (2 拍 2 脉冲不应越阈 THRESH=3)
+[GATE] canfail_2beat: max_pulses=2 (>=2) -> PASS
+sim/review_p23/tb_gate_sweep_canfail.sv:151: $finish called at 2200000 (1ps)
