@@ -8,6 +8,14 @@ ECS_双平台使用与数据手册.md
 .env*
 data/
 sim/sim_transient
+sim/*_work/
+.workbuddy/
+.kimi-code/
 *.pt
 *.pth
+
 *.bin
+*.out
+.DS_Store
+Thumbs.db
+

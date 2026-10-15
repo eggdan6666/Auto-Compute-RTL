@@ -1,0 +1,23 @@
+# Set default behavior to automatically normalize line endings
+* text=auto eol=lf
+
+# Explicitly declare text files
+*.sv text diff=verilog eol=lf
+*.v text diff=verilog eol=lf
+*.vams text diff=verilog eol=lf
+*.py text diff=python eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.csv text eol=lf
+*.hex text eol=lf
+*.sh text eol=lf
+*.json text eol=lf
+
+# Declare binary files
+*.pt binary
+*.pth binary
+*.vvp binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
